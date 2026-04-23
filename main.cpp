@@ -104,7 +104,7 @@ namespace data
 	public:
 		auto insert(std::string const &word) -> void;
 
-		auto root() const -> TrieNode const *;
+		auto root() const -> TrieNode const &;
 	};
 
 	struct Parsed
@@ -239,7 +239,7 @@ auto data::Grid::search_words(Trie const &trie) const -> std::set<std::string>
 	{
 		for (auto c = std::size_t { 0 }; c < m_grid[r].size(); ++c)
 		{
-			dfs(to_coords({ r, c }), trie.root(), visited, current, results);
+			dfs(to_coords({ r, c }), &trie.root(), visited, current, results);
 		}
 	}
 
@@ -399,7 +399,7 @@ auto data::Trie::insert(std::string const &word) -> void
 	current->is_end = true;
 }
 
-auto data::Trie::root() const -> TrieNode const *
+auto data::Trie::root() const -> TrieNode const &
 {
-	return &m_root;
+	return m_root;
 }
