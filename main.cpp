@@ -16,6 +16,8 @@
 
 namespace data
 {
+	struct TrieNode;
+	struct Trie;
 	struct Parsed;
 }
 
@@ -59,6 +61,8 @@ namespace data
 
 		auto populate(std::vector<char> const &letters) -> void;
 
+		auto search_words(Trie const &trie) const -> std::vector<std::string>;
+
 		auto to_coords(Indices const &indices) const -> Coords;
 		auto to_indices(Coords const &coords) const -> Indices;
 
@@ -69,6 +73,16 @@ namespace data
 		auto distance_from_middle(std::size_t const r) const -> std::size_t;
 
 		auto data() const -> std::vector<std::vector<char>> const &;
+
+	private:
+		auto dfs
+		(
+			Coords const &coords,
+			TrieNode const *node,
+			std::vector<std::vector<bool>> &visited,
+			std::string &current,
+			std::vector<std::string> &results
+		) const -> void;
 	};
 
 	struct TrieNode
@@ -113,16 +127,10 @@ auto main(int argc, char *argv[]) -> int
 	auto const grid = std::move(parsed.grid);
 	auto const trie = std::move(parsed.trie);
 
-	for (auto i = std::size_t { 0 }; i < grid.data().size(); ++i)
+	auto const results = grid.search_words(trie);
+	for (auto const word: results)
 	{
-		for (auto j = std::size_t { 0 }; j < grid.data()[i].size(); ++j)
-		{
-			auto const coords = grid.to_coords(data::Indices { i, j });
-
-			std::cout << *grid.at(coords) << ' ';
-		}
-
-		std::cout << '\n';
+		std::cout << word << '\n';
 	}
 }
 
@@ -212,9 +220,33 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 	}
 }
 
+auto data::Grid::search_words(Trie const &trie) const -> std::vector<std::string>
+{
+	auto results = std::vector<std::string> {};
+
+	auto visited = std::vector<std::vector<bool>>(m_grid.size());
+	for (auto i = std::size_t { 0 }; i < m_grid.size(); ++i)
+	{
+		visited[i].resize(m_grid[i].size(), false);
+	}
+
+	auto current = std::string {};
+
+	for (auto r = std::size_t { 0 }; r < m_grid.size(); ++r)
+	{
+		for (auto c = std::size_t { 0 }; c < m_grid[r].size(); ++c)
+		{
+			auto coords = to_coords({ r, c });
+			dfs(coords, trie.root(), visited, current, results);
+		}
+	}
+
+	return results;
+}
+
 auto data::Grid::to_coords(Indices const &indices) const -> Coords
 {
-	return Coords
+	return
 	{
 		indices.r,
 		indices.c * 2 + distance_from_middle(indices.r)
@@ -223,7 +255,7 @@ auto data::Grid::to_coords(Indices const &indices) const -> Coords
 
 auto data::Grid::to_indices(Coords const &coords) const -> Indices
 {
-	return Indices
+	return
 	{
 		coords.r,
 		(coords.c - distance_from_middle(coords.r)) / 2
@@ -251,12 +283,12 @@ auto data::Grid::neighbors(Coords const &coords) const -> std::vector<Coords>
 {
 	return std::vector<Coords>
 	{
-		Coords { coords.r - 1, coords.c - 1 }, // top-left
-		Coords { coords.r - 1, coords.c + 1 }, // top-right
-		Coords { coords.r    , coords.c - 2 }, // left
-		Coords { coords.r    , coords.c + 2 }, // right
-		Coords { coords.r + 1, coords.c - 1 }, // bottom-left
-		Coords { coords.r + 1, coords.c + 1 }, // bottom-right
+		{ coords.r - 1, coords.c - 1 }, // top-left
+		{ coords.r - 1, coords.c + 1 }, // top-right
+		{ coords.r    , coords.c - 2 }, // left
+		{ coords.r    , coords.c + 2 }, // right
+		{ coords.r + 1, coords.c - 1 }, // bottom-left
+		{ coords.r + 1, coords.c + 1 }, // bottom-right
 	};
 }
 
@@ -281,6 +313,54 @@ auto data::Grid::distance_from_middle(std::size_t const r) const -> std::size_t
 auto data::Grid::data() const -> std::vector<std::vector<char>> const &
 {
 	return m_grid;
+}
+
+auto data::Grid::dfs
+(
+	Coords const &coords,
+	TrieNode const *node,
+	std::vector<std::vector<bool>> &visited,
+	std::string &current,
+	std::vector<std::string> &results
+) const -> void
+{
+	auto const *letter_ptr = at(coords);
+	if (letter_ptr == nullptr)
+	{
+		return;
+	}
+
+	auto const indices = to_indices(coords);
+	auto const r = indices.r;
+	auto const c = indices.c;
+
+	if (visited[r][c])
+	{
+		return;
+	}
+
+	auto const letter = *letter_ptr;
+	node = node->step(letter);
+	if (node == nullptr)
+	{
+		return;
+	}
+
+	visited[r][c] = true;
+	current.push_back(letter);
+
+	if (node->is_end)
+	{
+		results.push_back(current);
+	}
+
+	for (auto const &neighbor: neighbors(coords))
+	{
+		dfs(neighbor, node, visited, current, results);
+	}
+
+	visited[r][c] = false;
+	current.pop_back();
 }
 
 
