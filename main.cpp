@@ -327,21 +327,23 @@ auto data::Grid::dfs
 	std::set<std::string> &results
 ) const -> void
 {
+	// Check if neighbor exists
 	auto const *letter_ptr = at(coords);
 	if (letter_ptr == nullptr)
 	{
 		return;
 	}
 
+	// Check if cell has been visited
 	auto const indices = to_indices(coords);
 	auto const r = indices.r;
 	auto const c = indices.c;
-
 	if (visited[r][c])
 	{
 		return;
 	}
 
+	// Check if the trie node has the letter as a child
 	auto const letter = *letter_ptr;
 	node = node->step(letter);
 	if (node == nullptr)
@@ -349,19 +351,22 @@ auto data::Grid::dfs
 		return;
 	}
 
+	// Set visited for the cell, push the letter into the word, push the word
+	// into the results if the trie node is a word end
 	visited[r][c] = true;
 	current.push_back(letter);
-
 	if (node->is_end)
 	{
 		results.insert(current);
 	}
 
+	// Recurse for all neighbors
 	for (auto const &neighbor: neighbors(coords))
 	{
 		dfs(neighbor, node, visited, current, results);
 	}
 
+	// Revert state for backtracking
 	visited[r][c] = false;
 	current.pop_back();
 }
