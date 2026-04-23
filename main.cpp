@@ -129,6 +129,8 @@ auto main(int argc, char *argv[]) -> int
 	auto const trie = std::move(parsed.trie);
 
 	auto const results = grid.search_words(trie);
+
+	std::cout << results.size() << '\n';
 	for (auto const word: results)
 	{
 		std::cout << word << '\n';
