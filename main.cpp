@@ -37,6 +37,13 @@ namespace utils
 
 namespace data
 {
+	// Grid system uses doubled-width coordinates
+	struct Coords
+	{
+		std::size_t r;
+		std::size_t c;
+	};
+
 	class Grid
 	{
 		std::vector<std::vector<char>> m_grid;
@@ -44,8 +51,11 @@ namespace data
 	public:
 		Grid(std::size_t const rows, std::size_t const max_width);
 
-		auto num_cells() const -> int;
 		auto populate(std::vector<char> const &letters) -> void;
+
+		auto at(Coords const &coords) const -> char const *;
+		auto num_cells() const -> std::size_t;
+		auto distance_from_middle_row(std::size_t const r) const -> std::size_t;
 		auto data() const -> std::vector<std::vector<char>> const &;
 	};
 
@@ -88,11 +98,15 @@ auto main(int argc, char *argv[]) -> int
 	auto const grid = std::move(parsed.grid);
 	auto const trie = std::move(parsed.trie);
 
-	for (auto const &row: grid.data())
+	for (auto i = std::size_t { 0 }; i < grid.data().size(); ++i)
 	{
-		for (auto const &letter: row)
+		for (auto j = std::size_t { 0 }; j < 11; j += 2)
 		{
-			std::cout << letter << ' ';
+			auto c = grid.at(data::Coords { i, j });
+			if (c != nullptr)
+			{
+				std::cout << *c << ' ';
+			}
 		}
 		std::cout << '\n';
 	}
@@ -164,28 +178,11 @@ auto utils::parse(std::string const &data) -> data::Parsed
 data::Grid::Grid(std::size_t const rows, std::size_t const max_width) :
 	m_grid(rows)
 {
-	auto const middle_index = rows / 2;
-
 	for (auto i = std::size_t { 0 }; i < rows; ++i)
 	{
-		auto const distance = (middle_index > i)
-			? (middle_index - i)
-			: (i - middle_index);
-
-		auto const width = max_width - distance;
+		auto const width = max_width - distance_from_middle_row(i);
 		m_grid[i].resize(width);
 	}
-}
-
-auto data::Grid::num_cells() const -> int
-{
-	auto accum = 0;
-	for (auto const &row: m_grid)
-	{
-		accum += row.size();
-	}
-
-	return accum;
 }
 
 auto data::Grid::populate(std::vector<char> const &letters) -> void
@@ -199,6 +196,39 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 			++i;
 		}
 	}
+}
+
+auto data::Grid::at(Coords const &coords) const -> char const *
+{
+	auto const r = coords.r;
+	auto const c = (coords.c - distance_from_middle_row(r)) / 2;
+
+	if (r < m_grid.size() && c < m_grid[r].size())
+	{
+		return &m_grid[r][c];
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+auto data::Grid::num_cells() const -> std::size_t
+{
+	auto accum = 0;
+	for (auto const &row: m_grid)
+	{
+		accum += row.size();
+	}
+
+	return accum;
+}
+
+auto data::Grid::distance_from_middle_row(std::size_t const r) const -> std::size_t
+{
+	auto const middle_index = m_grid.size() / 2;
+
+	return (middle_index > r) ? (middle_index - r) : (r - middle_index);
 }
 
 auto data::Grid::data() const -> std::vector<std::vector<char>> const &
