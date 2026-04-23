@@ -62,11 +62,11 @@ namespace data
 
 		auto populate(std::vector<char> const &letters) -> void;
 		auto search_words(Trie const &trie) const -> std::set<std::string>;
-		auto to_coords(Indices const &indices) const -> Coords;
 		auto num_cells() const -> std::size_t;
 
 	private:
 		auto to_indices(Coords const &coords) const -> Indices;
+		auto to_coords(Indices const &indices) const -> Coords;
 		auto at(Coords const &coords) const -> char const *;
 		auto neighbors(Coords const &coords) const -> std::array<Coords, 6>;
 		auto distance_from_middle(std::size_t const r) const -> std::size_t;
