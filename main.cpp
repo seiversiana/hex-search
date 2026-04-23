@@ -68,7 +68,7 @@ namespace data
 		auto to_indices(Coords const &coords) const -> Indices;
 
 		auto at(Coords const &coords) const -> char const *;
-		auto neighbors(Coords const &coords) const -> std::vector<Coords>;
+		auto neighbors(Coords const &coords) const -> std::array<Coords, 6>;
 
 		auto num_cells() const -> std::size_t;
 		auto distance_from_middle(std::size_t const r) const -> std::size_t;
@@ -282,16 +282,16 @@ auto data::Grid::at(Coords const &coords) const -> char const *
 	}
 }
 
-auto data::Grid::neighbors(Coords const &coords) const -> std::vector<Coords>
+auto data::Grid::neighbors(Coords const &coords) const -> std::array<Coords, 6>
 {
-	return std::vector<Coords>
+	return std::array<Coords, 6>
 	{
-		{ coords.r - 1, coords.c - 1 }, // top-left
-		{ coords.r - 1, coords.c + 1 }, // top-right
-		{ coords.r    , coords.c - 2 }, // left
-		{ coords.r    , coords.c + 2 }, // right
-		{ coords.r + 1, coords.c - 1 }, // bottom-left
-		{ coords.r + 1, coords.c + 1 }, // bottom-right
+		Coords { coords.r - 1, coords.c - 1 }, // top-left
+		Coords { coords.r - 1, coords.c + 1 }, // top-right
+		Coords { coords.r    , coords.c - 2 }, // left
+		Coords { coords.r    , coords.c + 2 }, // right
+		Coords { coords.r + 1, coords.c - 1 }, // bottom-left
+		Coords { coords.r + 1, coords.c + 1 }, // bottom-right
 	};
 }
 
