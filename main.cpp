@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <vector>
 
 
 
@@ -69,8 +70,6 @@ auto main(int argc, char *argv[]) -> int
 	auto const input_path = std::string(argv[1]);
 	auto const input = utils::read_file(input_path);
 	auto const trie = utils::parse(input);
-
-	int x = 0;
 }
 
 
@@ -131,9 +130,7 @@ auto utils::parse(std::string const &data) -> data::Trie
 
 	for (int i = 0; i < w; ++i)
 	{
-		auto const word = extract<std::string>(stream);
-		std::cout << word << '\n';
-		trie.insert(word);
+		trie.insert(extract<std::string>(stream));
 	}
 
 	return trie;
