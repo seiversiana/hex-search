@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -61,7 +62,7 @@ namespace data
 
 		auto populate(std::vector<char> const &letters) -> void;
 
-		auto search_words(Trie const &trie) const -> std::vector<std::string>;
+		auto search_words(Trie const &trie) const -> std::set<std::string>;
 
 		auto to_coords(Indices const &indices) const -> Coords;
 		auto to_indices(Coords const &coords) const -> Indices;
@@ -81,7 +82,7 @@ namespace data
 			TrieNode const *node,
 			std::vector<std::vector<bool>> &visited,
 			std::string &current,
-			std::vector<std::string> &results
+			std::set<std::string> &results
 		) const -> void;
 	};
 
@@ -220,9 +221,9 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 	}
 }
 
-auto data::Grid::search_words(Trie const &trie) const -> std::vector<std::string>
+auto data::Grid::search_words(Trie const &trie) const -> std::set<std::string>
 {
-	auto results = std::vector<std::string> {};
+	auto results = std::set<std::string> {};
 
 	auto visited = std::vector<std::vector<bool>>(m_grid.size());
 	for (auto i = std::size_t { 0 }; i < m_grid.size(); ++i)
@@ -321,7 +322,7 @@ auto data::Grid::dfs
 	TrieNode const *node,
 	std::vector<std::vector<bool>> &visited,
 	std::string &current,
-	std::vector<std::string> &results
+	std::set<std::string> &results
 ) const -> void
 {
 	auto const *letter_ptr = at(coords);
@@ -351,7 +352,7 @@ auto data::Grid::dfs
 
 	if (node->is_end)
 	{
-		results.push_back(current);
+		results.insert(current);
 	}
 
 	for (auto const &neighbor: neighbors(coords))
