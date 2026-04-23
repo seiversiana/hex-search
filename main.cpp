@@ -54,6 +54,7 @@ namespace data
 		auto populate(std::vector<char> const &letters) -> void;
 
 		auto at(Coords const &coords) const -> char const *;
+		auto neighbors(Coords const &coords) const -> std::vector<Coords>;
 		auto num_cells() const -> std::size_t;
 		auto distance_from_middle_row(std::size_t const r) const -> std::size_t;
 		auto data() const -> std::vector<std::vector<char>> const &;
@@ -98,17 +99,15 @@ auto main(int argc, char *argv[]) -> int
 	auto const grid = std::move(parsed.grid);
 	auto const trie = std::move(parsed.trie);
 
-	for (auto i = std::size_t { 0 }; i < grid.data().size(); ++i)
+	auto const neighbors = grid.neighbors(data::Coords { 2, 10 });
+	for (auto const neighbor: neighbors)
 	{
-		for (auto j = std::size_t { 0 }; j < 11; j += 2)
+		auto const letter = grid.at(neighbor);
+
+		if (letter != nullptr)
 		{
-			auto c = grid.at(data::Coords { i, j });
-			if (c != nullptr)
-			{
-				std::cout << *c << ' ';
-			}
+			std::cout << *grid.at(neighbor) << ' ';
 		}
-		std::cout << '\n';
 	}
 }
 
@@ -211,6 +210,19 @@ auto data::Grid::at(Coords const &coords) const -> char const *
 	{
 		return nullptr;
 	}
+}
+
+auto data::Grid::neighbors(Coords const &coords) const -> std::vector<Coords>
+{
+	return std::vector<Coords>
+	{
+		Coords { coords.r - 1, coords.c - 1 }, // top-left
+		Coords { coords.r - 1, coords.c + 1 }, // top-right
+		Coords { coords.r    , coords.c - 2 }, // left
+		Coords { coords.r    , coords.c + 2 }, // right
+		Coords { coords.r + 1, coords.c - 1 }, // bottom-left
+		Coords { coords.r + 1, coords.c + 1 }, // bottom-right
+	};
 }
 
 auto data::Grid::num_cells() const -> std::size_t
