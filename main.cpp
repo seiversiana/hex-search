@@ -123,8 +123,8 @@ auto main(int argc, char *argv[]) -> int
 {
 	auto const input_path = std::string(argv[1]);
 	auto const input = utils::read_file(input_path);
-	auto parsed = utils::parse(input);
 
+	auto parsed = utils::parse(input);
 	auto const grid = std::move(parsed.grid);
 	auto const trie = std::move(parsed.trie);
 
@@ -177,7 +177,7 @@ auto utils::parse(std::string const &data) -> data::Parsed
 {
 	auto stream = std::istringstream(data);
 
-	auto const rows = extract<std::size_t>(stream);
+	auto const rows      = extract<std::size_t>(stream);
 	auto const max_width = extract<std::size_t>(stream);
 	auto const num_words = extract<std::size_t>(stream);
 
@@ -225,8 +225,6 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 
 auto data::Grid::search_words(Trie const &trie) const -> std::set<std::string>
 {
-	auto results = std::set<std::string> {};
-
 	auto visited = std::vector<std::vector<bool>>(m_grid.size());
 	for (auto i = std::size_t { 0 }; i < m_grid.size(); ++i)
 	{
@@ -235,12 +233,13 @@ auto data::Grid::search_words(Trie const &trie) const -> std::set<std::string>
 
 	auto current = std::string {};
 
+	auto results = std::set<std::string> {};
+
 	for (auto r = std::size_t { 0 }; r < m_grid.size(); ++r)
 	{
 		for (auto c = std::size_t { 0 }; c < m_grid[r].size(); ++c)
 		{
-			auto coords = to_coords({ r, c });
-			dfs(coords, trie.root(), visited, current, results);
+			dfs(to_coords({ r, c }), trie.root(), visited, current, results);
 		}
 	}
 
