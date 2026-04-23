@@ -46,6 +46,7 @@ namespace data
 
 		auto num_cells() const -> int;
 		auto populate(std::vector<char> const &letters) -> void;
+		auto data() const -> std::vector<std::vector<char>> const &;
 	};
 
 	struct TrieNode
@@ -82,7 +83,19 @@ auto main(int argc, char *argv[]) -> int
 {
 	auto const input_path = std::string(argv[1]);
 	auto const input = utils::read_file(input_path);
-	auto const trie = utils::parse(input);
+	auto parsed = utils::parse(input);
+
+	auto const grid = std::move(parsed.grid);
+	auto const trie = std::move(parsed.trie);
+
+	for (auto const &row: grid.data())
+	{
+		for (auto const &letter: row)
+		{
+			std::cout << letter << ' ';
+		}
+		std::cout << '\n';
+	}
 }
 
 
@@ -186,6 +199,11 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 			++i;
 		}
 	}
+}
+
+auto data::Grid::data() const -> std::vector<std::vector<char>> const &
+{
+	return m_grid;
 }
 
 
