@@ -61,19 +61,16 @@ namespace data
 		Grid(std::size_t const rows, std::size_t const max_width);
 
 		auto populate(std::vector<char> const &letters) -> void;
-
 		auto search_words(Trie const &trie) const -> std::set<std::string>;
-
 		auto to_coords(Indices const &indices) const -> Coords;
-		auto to_indices(Coords const &coords) const -> Indices;
-
-		auto at(Coords const &coords) const -> char const *;
-		auto neighbors(Coords const &coords) const -> std::array<Coords, 6>;
-
 		auto num_cells() const -> std::size_t;
-		auto distance_from_middle(std::size_t const r) const -> std::size_t;
 
 	private:
+		auto to_indices(Coords const &coords) const -> Indices;
+		auto at(Coords const &coords) const -> char const *;
+		auto neighbors(Coords const &coords) const -> std::array<Coords, 6>;
+		auto distance_from_middle(std::size_t const r) const -> std::size_t;
+
 		auto dfs
 		(
 			Coords const &coords,
@@ -91,7 +88,6 @@ namespace data
 
 	public:
 		auto step_inserting(char const letter) -> TrieNode *;
-
 		auto step(char const letter) const -> TrieNode const *;
 	};
 
@@ -101,7 +97,6 @@ namespace data
 
 	public:
 		auto insert(std::string const &word) -> void;
-
 		auto root() const -> TrieNode const &;
 	};
 
