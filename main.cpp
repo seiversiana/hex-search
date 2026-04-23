@@ -64,8 +64,10 @@ namespace data
 
 		auto at(Coords const &coords) const -> char const *;
 		auto neighbors(Coords const &coords) const -> std::vector<Coords>;
+
 		auto num_cells() const -> std::size_t;
-		auto distance_from_middle_row(std::size_t const r) const -> std::size_t;
+		auto distance_from_middle(std::size_t const r) const -> std::size_t;
+
 		auto data() const -> std::vector<std::vector<char>> const &;
 	};
 
@@ -74,7 +76,9 @@ namespace data
 		bool is_end = false;
 		std::array<std::unique_ptr<TrieNode>, 26> children {};
 
+	public:
 		auto step_inserting(char const letter) -> TrieNode *;
+
 		auto step(char const letter) const -> TrieNode const *;
 	};
 
@@ -84,6 +88,7 @@ namespace data
 
 	public:
 		auto insert(std::string const &word) -> void;
+
 		auto root() const -> TrieNode const *;
 	};
 
@@ -169,7 +174,7 @@ auto utils::parse(std::string const &data) -> data::Parsed
 	auto letters = std::vector<char>(grid.num_cells());
 	for (auto &letter: letters)
 	{
-		letter = extract<char>(stream);
+		letter = safe_toupper(extract<char>(stream));
 	}
 	grid.populate(letters);
 
@@ -189,7 +194,7 @@ data::Grid::Grid(std::size_t const rows, std::size_t const max_width) :
 {
 	for (auto i = std::size_t { 0 }; i < rows; ++i)
 	{
-		auto const width = max_width - distance_from_middle_row(i);
+		auto const width = max_width - distance_from_middle(i);
 		m_grid[i].resize(width);
 	}
 }
@@ -212,7 +217,7 @@ auto data::Grid::to_coords(Indices const &indices) const -> Coords
 	return Coords
 	{
 		indices.r,
-		indices.c * 2 + distance_from_middle_row(indices.r)
+		indices.c * 2 + distance_from_middle(indices.r)
 	};
 }
 
@@ -221,7 +226,7 @@ auto data::Grid::to_indices(Coords const &coords) const -> Indices
 	return Indices
 	{
 		coords.r,
-		(coords.c - distance_from_middle_row(coords.r)) / 2
+		(coords.c - distance_from_middle(coords.r)) / 2
 	};
 }
 
@@ -266,7 +271,7 @@ auto data::Grid::num_cells() const -> std::size_t
 	return accum;
 }
 
-auto data::Grid::distance_from_middle_row(std::size_t const r) const -> std::size_t
+auto data::Grid::distance_from_middle(std::size_t const r) const -> std::size_t
 {
 	auto const middle_index = m_grid.size() / 2;
 
