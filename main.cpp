@@ -1,6 +1,19 @@
 // SPDX-FileCopyrightText: Copyright (C) Nile Jocson <seiversiana@gmail.com>
 // SPDX-License-Identifier: MPL-2.0
 
+/*
+Nile Jocson, 2024-00045
+EEE 121 THWX3
+
+References used:
+*	https://cppreference.com/
+*	https://www.redblobgames.com/grids/hexagons/
+*	https://en.wikipedia.org/wiki/Depth-first_search
+*	https://en.wikipedia.org/wiki/Trie
+*/
+
+
+
 #include <cctype>
 #include <cstdlib>
 
