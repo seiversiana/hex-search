@@ -7,7 +7,7 @@
 
 
 
-auto read_file_to_string(std::string const &path) -> std::string
+auto read_file(std::string const &path) -> std::string
 {
 	auto file = std::ifstream(path);
 	auto buffer = std::ostringstream {};
@@ -23,5 +23,5 @@ auto main(int argc, char *argv[]) -> int
 {
 	auto const input_path = std::string(argv[1]);
 
-	std::cout << read_file_to_string(input_path);
+	std::cout << read_file(input_path);
 }
