@@ -37,6 +37,12 @@ namespace utils
 
 namespace data
 {
+	struct Indices
+	{
+		std::size_t r;
+		std::size_t c;
+	};
+
 	// Grid system uses doubled-width coordinates
 	struct Coords
 	{
@@ -52,6 +58,9 @@ namespace data
 		Grid(std::size_t const rows, std::size_t const max_width);
 
 		auto populate(std::vector<char> const &letters) -> void;
+
+		auto to_coords(Indices const &indices) const -> Coords;
+		auto to_indices(Coords const &coords) const -> Indices;
 
 		auto at(Coords const &coords) const -> char const *;
 		auto neighbors(Coords const &coords) const -> std::vector<Coords>;
@@ -99,15 +108,16 @@ auto main(int argc, char *argv[]) -> int
 	auto const grid = std::move(parsed.grid);
 	auto const trie = std::move(parsed.trie);
 
-	auto const neighbors = grid.neighbors(data::Coords { 2, 10 });
-	for (auto const neighbor: neighbors)
+	for (auto i = std::size_t { 0 }; i < grid.data().size(); ++i)
 	{
-		auto const letter = grid.at(neighbor);
-
-		if (letter != nullptr)
+		for (auto j = std::size_t { 0 }; j < grid.data()[i].size(); ++j)
 		{
-			std::cout << *grid.at(neighbor) << ' ';
+			auto const coords = grid.to_coords(data::Indices { i, j });
+
+			std::cout << *grid.at(coords) << ' ';
 		}
+
+		std::cout << '\n';
 	}
 }
 
@@ -197,10 +207,30 @@ auto data::Grid::populate(std::vector<char> const &letters) -> void
 	}
 }
 
+auto data::Grid::to_coords(Indices const &indices) const -> Coords
+{
+	return Coords
+	{
+		indices.r,
+		indices.c * 2 + distance_from_middle_row(indices.r)
+	};
+}
+
+auto data::Grid::to_indices(Coords const &coords) const -> Indices
+{
+	return Indices
+	{
+		coords.r,
+		(coords.c - distance_from_middle_row(coords.r)) / 2
+	};
+}
+
 auto data::Grid::at(Coords const &coords) const -> char const *
 {
-	auto const r = coords.r;
-	auto const c = (coords.c - distance_from_middle_row(r)) / 2;
+	auto const indices = to_indices(coords);
+
+	auto const r = indices.r;
+	auto const c = indices.c;
 
 	if (r < m_grid.size() && c < m_grid[r].size())
 	{
