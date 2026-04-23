@@ -315,8 +315,8 @@ auto data::Grid::dfs
 ) const -> void
 {
 	// Check if neighbor exists
-	auto const *letter_ptr = at(coords);
-	if (letter_ptr == nullptr)
+	auto const *cell = at(coords);
+	if (cell == nullptr)
 	{
 		return;
 	}
@@ -331,7 +331,7 @@ auto data::Grid::dfs
 	}
 
 	// Check if the trie node has the letter as a child
-	auto const letter = *letter_ptr;
+	auto const letter = *cell;
 	node = node->step(letter);
 	if (node == nullptr)
 	{
