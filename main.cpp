@@ -73,8 +73,6 @@ namespace data
 		auto num_cells() const -> std::size_t;
 		auto distance_from_middle(std::size_t const r) const -> std::size_t;
 
-		auto data() const -> std::vector<std::vector<char>> const &;
-
 	private:
 		auto dfs
 		(
@@ -310,11 +308,6 @@ auto data::Grid::distance_from_middle(std::size_t const r) const -> std::size_t
 	auto const middle_index = m_grid.size() / 2;
 
 	return (middle_index > r) ? (middle_index - r) : (r - middle_index);
-}
-
-auto data::Grid::data() const -> std::vector<std::vector<char>> const &
-{
-	return m_grid;
 }
 
 auto data::Grid::dfs
