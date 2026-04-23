@@ -297,7 +297,7 @@ auto data::Grid::neighbors(Coords const &coords) const -> std::vector<Coords>
 
 auto data::Grid::num_cells() const -> std::size_t
 {
-	auto accum = 0;
+	auto accum = std::size_t { 0 };
 	for (auto const &row: m_grid)
 	{
 		accum += row.size();
