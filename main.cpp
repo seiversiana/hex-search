@@ -11,11 +11,24 @@
 
 
 
+namespace data
+{
+	class Grid;
+	class Trie;
+}
+
 namespace utils
 {
 	auto safe_toupper(char const letter) -> char;
+
 	auto letter_index(char const letter) -> std::size_t;
+
 	auto read_file(std::string const &path) -> std::string;
+
+	template<typename T>
+	auto extract(std::istringstream &buffer) -> T;
+
+	auto parse(std::string const &data) -> data::Trie;
 }
 
 
@@ -54,8 +67,10 @@ namespace data
 auto main(int argc, char *argv[]) -> int
 {
 	auto const input_path = std::string(argv[1]);
+	auto const input = utils::read_file(input_path);
+	auto const trie = utils::parse(input);
 
-	std::cout << utils::read_file(input_path);
+	int x = 0;
 }
 
 
@@ -64,7 +79,7 @@ auto main(int argc, char *argv[]) -> int
 
 
 
-// IMPLEMENTATIONS
+// Implementations
 
 auto utils::safe_toupper(char const letter) -> char
 {
@@ -79,12 +94,52 @@ auto utils::letter_index(char const letter) -> std::size_t
 auto utils::read_file(std::string const &path) -> std::string
 {
 	auto file = std::ifstream(path);
-	auto buffer = std::ostringstream {};
+	auto stream = std::ostringstream {};
 
-	buffer << file.rdbuf();
+	stream << file.rdbuf();
 
-	return buffer.str();
+	return stream.str();
 }
+
+template<typename T>
+auto utils::extract(std::istringstream &buffer) -> T
+{
+	T value;
+	buffer >> value;
+	return value;
+}
+
+auto utils::parse(std::string const &data) -> data::Trie
+{
+	auto stream = std::istringstream(data);
+
+	auto const m = extract<std::size_t>(stream);
+	auto const n = extract<std::size_t>(stream);
+	auto const w = extract<std::size_t>(stream);
+
+	auto const top_rows = m / 2;
+	auto const min_width = n - top_rows;
+	auto const top_count = top_rows * (min_width + n - 1) / 2;
+	auto const lettercount = 2 * top_count + n;
+
+	for (int i = 0; i < lettercount; ++i)
+	{
+		extract<char>(stream);
+	}
+
+	auto trie = data::Trie {};
+
+	for (int i = 0; i < w; ++i)
+	{
+		auto const word = extract<std::string>(stream);
+		std::cout << word << '\n';
+		trie.insert(word);
+	}
+
+	return trie;
+}
+
+
 
 auto data::TrieNode::step_inserting(char const letter) -> TrieNode *
 {
