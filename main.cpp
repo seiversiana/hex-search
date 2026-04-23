@@ -2,20 +2,21 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include <cctype>
+#include <cstdlib>
 
 #include <array>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 
 
 namespace data
 {
-	class Grid;
-	class Trie;
+	struct Parsed;
 }
 
 namespace utils
@@ -29,7 +30,7 @@ namespace utils
 	template<typename T>
 	auto extract(std::istringstream &buffer) -> T;
 
-	auto parse(std::string const &data) -> data::Trie;
+	auto parse(std::string const &data) -> data::Parsed;
 }
 
 
@@ -38,7 +39,13 @@ namespace data
 {
 	class Grid
 	{
+		std::vector<std::vector<char>> m_grid;
 
+	public:
+		Grid(std::size_t const rows, std::size_t const max_width);
+
+		auto num_cells() const -> int;
+		auto populate(std::vector<char> const &letters) -> void;
 	};
 
 	struct TrieNode
@@ -57,6 +64,12 @@ namespace data
 	public:
 		auto insert(std::string const &word) -> void;
 		auto root() const -> TrieNode const *;
+	};
+
+	struct Parsed
+	{
+		Grid grid;
+		Trie trie;
 	};
 }
 
@@ -108,32 +121,71 @@ auto utils::extract(std::istringstream &buffer) -> T
 	return value;
 }
 
-auto utils::parse(std::string const &data) -> data::Trie
+auto utils::parse(std::string const &data) -> data::Parsed
 {
 	auto stream = std::istringstream(data);
 
-	auto const m = extract<std::size_t>(stream);
-	auto const n = extract<std::size_t>(stream);
-	auto const w = extract<std::size_t>(stream);
+	auto const rows = extract<std::size_t>(stream);
+	auto const max_width = extract<std::size_t>(stream);
+	auto const num_words = extract<std::size_t>(stream);
 
-	auto const top_rows = m / 2;
-	auto const min_width = n - top_rows;
-	auto const top_count = top_rows * (min_width + n - 1) / 2;
-	auto const lettercount = 2 * top_count + n;
-
-	for (int i = 0; i < lettercount; ++i)
+	auto grid = data::Grid(rows, max_width);
+	auto letters = std::vector<char>(grid.num_cells());
+	for (auto &letter: letters)
 	{
-		extract<char>(stream);
+		letter = extract<char>(stream);
 	}
+	grid.populate(letters);
 
 	auto trie = data::Trie {};
-
-	for (int i = 0; i < w; ++i)
+	for (int i = 0; i < num_words; ++i)
 	{
 		trie.insert(extract<std::string>(stream));
 	}
 
-	return trie;
+	return data::Parsed { std::move(grid), std::move(trie) };
+}
+
+
+
+data::Grid::Grid(std::size_t const rows, std::size_t const max_width) :
+	m_grid(rows)
+{
+	auto const middle_index = rows / 2;
+
+	for (auto i = std::size_t { 0 }; i < rows; ++i)
+	{
+		auto const distance = (middle_index > i)
+			? (middle_index - i)
+			: (i - middle_index);
+
+		auto const width = max_width - distance;
+		m_grid[i].resize(width);
+	}
+}
+
+auto data::Grid::num_cells() const -> int
+{
+	auto accum = 0;
+	for (auto const &row: m_grid)
+	{
+		accum += row.size();
+	}
+
+	return accum;
+}
+
+auto data::Grid::populate(std::vector<char> const &letters) -> void
+{
+	auto i = std::size_t { 0 };
+	for (auto &row: m_grid)
+	{
+		for (auto &cell: row)
+		{
+			cell = letters[i];
+			++i;
+		}
+	}
 }
 
 
