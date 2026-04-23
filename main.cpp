@@ -138,7 +138,7 @@ auto utils::parse(std::string const &data) -> data::Parsed
 	grid.populate(letters);
 
 	auto trie = data::Trie {};
-	for (int i = 0; i < num_words; ++i)
+	for (auto i = std::size_t { 0 }; i < num_words; ++i)
 	{
 		trie.insert(extract<std::string>(stream));
 	}
