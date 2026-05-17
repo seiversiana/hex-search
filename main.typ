@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) Nile Jocson <seiversiana@gmail.com>
+// SPDX-FileCopyrightText: Copyright (C) Nile Jocson <neviusiana@gmail.com>
 // SPDX-License-Identifier: MPL-2.0
 
 #import "@preview/charged-ieee:0.1.4": ieee
@@ -36,7 +36,7 @@
 
 
 = Source
-The Git repository for this project is located at https://github.com/seiversiana/hex-search.
+The Git repository for this project is located at https://github.com/neviusiana/hex-search.
 Included are the license and source code.
 
 

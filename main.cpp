@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) Nile Jocson <seiversiana@gmail.com>
+// SPDX-FileCopyrightText: Copyright (C) Nile Jocson <neviusiana@gmail.com>
 // SPDX-License-Identifier: MPL-2.0
 
 /*
